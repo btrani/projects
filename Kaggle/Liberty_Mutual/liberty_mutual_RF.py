@@ -8,16 +8,19 @@ First script for the Kaggle Liberty Mutual competition
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import preprocessing
-from sklearn.ensemble import RandomForestRegressor
 
-
-df_train = pd.read_csv('/Users/btrani/Git/Kaggle/Liberty_Mutual/train.csv', index_col = 0)
-df_test = pd.read_csv('/Users/btrani/Git/Kaggle/Liberty_Mutual/test.csv', index_col = 0)
+df_train = pd.read_csv('/Users/btrani/Git/Data/LM/train.csv', index_col = 0)
+df_test = pd.read_csv('/Users/btrani/Git/Data/LM/test.csv', index_col = 0)
 
 labels = df_train['Hazard']
 df_train.drop('Hazard', axis=1, inplace=True)
+#df_train.drop('T2_V12', axis=1, inplace=True)
+#df_train.drop('T2_V8', axis=1, inplace=True)
+#df_train.drop('T1_V17', axis=1, inplace=True)
+
+#df_test.drop('T2_V12', axis=1, inplace=True)
+#df_test.drop('T2_V8', axis=1, inplace=True)
+#df_test.drop('T1_V17', axis=1, inplace=True)
 
 columns = df_train.columns
 test_ind = df_test.index
@@ -25,6 +28,7 @@ test_ind = df_test.index
 train = np.array(df_train)
 test = np.array(df_test)
 
+from sklearn import preprocessing
 for i in range(train.shape[1]):
     lbl = preprocessing.LabelEncoder()
     lbl.fit(list(train[:,i]) + list(test[:,i]))
@@ -34,11 +38,16 @@ for i in range(train.shape[1]):
 train = train.astype(float)
 test = test.astype(float)
 
-model = RandomForestRegressor(n_estimators = 500, max_depth=10)
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor(n_estimators = 500, max_depth = 20, \
+min_samples_leaf = 4)
+model = model.fit(train, labels)
+predict = model.predict(test)
 
-model.fit(train, labels)
+print sorted(zip(map(lambda x: round(x, 4), model.feature_importances_), columns), 
+             reverse=True)
+print model.score(train, labels)
 
-prediction = model.predict(test)
-submission = pd.DataFrame({"Id": test_ind, "Hazard": prediction})
+submission = pd.DataFrame({"Id": test_ind, "Hazard": predict})
 submission = submission.set_index("Id")
-submission.to_csv('/Users/btrani/Git/Kaggle/Liberty_Mutual/sub_1.csv')
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Liberty_Mutual/sub_6.csv')
