@@ -15,14 +15,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 
-df = pd.read_csv('/Users/btrani/Git/LA_Data/LAPD_Crime_and_Collision_Raw_Data_-_2014.csv')
+#Bring 2014 data into dataframe
+#To Do - connect directly via LA's SOAP API
+df = pd.read_csv('/Users/btrani/Git/Data/LAPD_Crime_and_Collision_Raw_Data_-_2014.csv')
 
 df = df.dropna(subset = ['Location 1'])
 
+#Split lat and long out
 df[['lat','long']] = df['Location 1'].apply(eval).apply(pd.Series)
 
-pd.options.display.mpl_style = 'default' #Better Styling  
-new_style = {'grid': False} #Remove grid  
+#Set styling for plot
+pd.options.display.mpl_style = 'default'
+new_style = {'grid': False}
 matplotlib.rc('axes', **new_style)
 rcParams['figure.dpi'] = 500
 rcParams['figure.figsize'] = (20, 20)
@@ -32,4 +36,4 @@ xlim=(-118.7, -118.1), ylim=(33.61, 34.4), s=.02,alpha=.6)
 P.set_axis_bgcolor('black') #Background Color
 P.axes.get_xaxis().set_visible(False)
 P.axes.get_yaxis().set_visible(False)
-plt.savefig('/Users/btrani/Git/LA_Data/LA_Crime.jpeg', bbox_inches='tight')
+plt.savefig('/Users/btrani/Git/projects/LA_Data/LA_Crime.jpeg', bbox_inches='tight')
