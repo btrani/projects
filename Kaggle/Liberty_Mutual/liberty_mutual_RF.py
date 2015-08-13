@@ -51,14 +51,3 @@ print model.score(train, labels)
 submission = pd.DataFrame({"Id": test_ind, "Hazard": predict})
 submission = submission.set_index("Id")
 submission.to_csv('/Users/btrani/Git/projects/Kaggle/Liberty_Mutual/sub_6.csv')
-
-#from sklearn import linear_model
-#clf = linear_model.Ridge (alpha = .5)
-#clf.fit(train, labels)
-#lr_predict = clf.predict(test)
-
-from sklearn.svm import SVR
-svr = SVR()
-svr.fit(train, labels)
-svr_predict = svr.predict(test)
-print svr.score(train, labels)
