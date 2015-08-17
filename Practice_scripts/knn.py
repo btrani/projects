@@ -33,20 +33,25 @@ def log(x):
     return math.log(x)
 
 df['log_sale'] = df['SALE PRICE'].apply(log)
+df['log_avg_sale'] = df['avg_sale_by_zip'].apply(log)
+df['gsf_log'] = df['GROSS SQUARE FEET'].apply(log)
 
 #Investigate potential relationships via scatter matrix
 a = pd.scatter_matrix(df, figsize = (10,10), diagonal='hist')
 
+#Split into train and test data sets
+labels = df['log_sale']
+df_clean = df[['TOTAL UNITS', 'avg_sale_by_zip', 'GROSS SQUARE FEET']]
+
+X_train, X_test, y_train, y_test = train_test_split(df_clean, labels, \
+test_size=0.2, random_state=0)
+
 #Prep independent and dependent variables for regression
-y = np.matrix(df['log_sale']).transpose()
-x1 = np.matrix(df['GROSS SQUARE FEET']).transpose()
-x2 = np.matrix(df['TOTAL UNITS']).transpose()
-x3 = np.matrix(df['avg_sale_by_zip']).transpose()
-x = np.column_stack([x1, x2, x3])
+y = np.matrix(y_train).transpose()
 
 #Fit the OLS model
-X = sm.add_constant(x)
-model = sm.OLS(y, X)
+X = sm.add_constant(X_train)
+model = sm.OLS(y, X_train)
 fitted = model.fit()
 print fitted.summary()
 

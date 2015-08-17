@@ -73,6 +73,7 @@ submission.to_csv('/Users/btrani/Git/projects/Kaggle/Liberty_Mutual/sub_8.csv')
 
 #Model #2 Extreme Gradient Boost using xgboost
 import xgboost as xgb
+import matplotlib.pyplot as plt
 
 #Subset the data and set up model parameters
 offset = 10000
@@ -91,6 +92,11 @@ watchlist = [(xgtrain, 'train'),(xgval, 'val')]
 model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
 early_stopping_rounds=4)
 preds1 = model.predict(xgtest)
+
+print xgboost.plot_importance(model)
+
+fscore = [ (v,k) for k,v in model.get_fscore().iteritems() ]
+fscore.sort(reverse=True)
 
 #Send predicted scores to csv file
 submission = pd.DataFrame({"Id": test_ind, "Hazard": preds1})
