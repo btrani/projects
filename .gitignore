@@ -1,2 +1,10 @@
 
 *.csv
+
+Kaggle/Springleaf/test_script
+
+*.csv#
+
+*.json
+
+*.txt
