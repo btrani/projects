@@ -73,7 +73,6 @@ submission.to_csv('/Users/btrani/Git/projects/Kaggle/Liberty_Mutual/sub_8.csv')
 
 #Model #2 Extreme Gradient Boost using xgboost
 import xgboost as xgb
-import matplotlib.pyplot as plt
 
 #Subset the data and set up model parameters
 offset = 10000
