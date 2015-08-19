@@ -34,19 +34,20 @@ for col in obs:
         del test[col]
         del train[col]
         
-train = train.fillna(-1)
-test = test.fillna(-1)
+#train = train.fillna(-1)
+#test = test.fillna(-1)
 
 test_ind = test.index
 
 #Create XGB model   
 import xgboost as xgb
 
-offset = 50000
-num_round = 100
 xgtest = xgb.DMatrix(test)
-gb_params = {'max_depth':6, 'eta':1, 'silent':1, \
-'objective':'binary:logistic', 'eval_metric': 'auc' }
+
+offset = 30000
+num_round = 50
+gb_params = {'max_depth':16, 'eta':.1, 'silent':1, \
+'objective':'binary:logistic', 'eval_metric': 'auc'}
 
 #Create a train and validation dmatrices 
 xgtrain = xgb.DMatrix(train[offset:], label=labels[offset:])
@@ -56,9 +57,38 @@ xgval = xgb.DMatrix(train[:offset], label=labels[:offset])
 watchlist = [(xgtrain, 'train'),(xgval, 'val')]
 model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
 early_stopping_rounds=4)
-preds1 = model.predict(xgtest)
+preds1 = model.predict(xgtest, ntree_limit=model.best_iteration)
+
+fscore = [ (v,k) for k,v in model.get_fscore().iteritems() ]
+fscore.sort(reverse=True)
+
+model.dump_model('dump.raw.txt')
 
 #Send predicted scores to csv file
 submission = pd.DataFrame({"Id": test_ind, "target": preds1})
 submission = submission.set_index("Id")
-submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_2.csv')
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_9.csv')
+
+"""Model #2 RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import cross_validation
+from sklearn.cross_validation import train_test_split
+
+#Split data into train and test
+X_train, X_test, y_train, y_test = train_test_split(train, labels, \
+test_size=0.2, random_state=0)
+
+#Use KFold cross validation
+#cv = cross_validation.KFold(len(train), n_folds = 5)
+
+#Train and fit RF model
+rf_model = RandomForestClassifier(n_estimators = 500, max_depth = 10, n_jobs = -1)
+rf_model.fit(train, labels)
+
+#Use trained model to predict test values
+preds2 = rf_model.predict(test)
+
+#Send predicted scores to csv file
+submission = pd.DataFrame({"Id": test_ind, "target": preds2})
+submission = submission.set_index("Id")
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_rf_1.csv')"""

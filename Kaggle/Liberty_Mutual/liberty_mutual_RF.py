@@ -75,7 +75,7 @@ submission.to_csv('/Users/btrani/Git/projects/Kaggle/Liberty_Mutual/sub_8.csv')
 import xgboost as xgb
 
 #Subset the data and set up model parameters
-offset = 10000
+offset = 5000
 num_round = 1000
 xgtest = xgb.DMatrix(test)
 gb_params = {"objective":"reg:linear", "eta": 0.005, "min_child_weight": 6, \
@@ -91,8 +91,6 @@ watchlist = [(xgtrain, 'train'),(xgval, 'val')]
 model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
 early_stopping_rounds=4)
 preds1 = model.predict(xgtest)
-
-print xgboost.plot_importance(model)
 
 fscore = [ (v,k) for k,v in model.get_fscore().iteritems() ]
 fscore.sort(reverse=True)
