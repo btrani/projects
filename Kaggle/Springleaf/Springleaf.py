@@ -20,6 +20,17 @@ test = test.drop(constants, axis=1)
 
 labels = train['target']
 train.drop('target', axis=1, inplace=True)
+train.drop('VAR_0212', axis=1, inplace=True)
+train.drop('VAR_0227', axis=1, inplace=True)
+train.drop('VAR_0254', axis=1, inplace=True)
+train.drop('VAR_0551', axis=1, inplace=True)
+train.drop('VAR_0811', axis=1, inplace=True)
+
+test.drop('VAR_0811', axis=1, inplace=True)
+test.drop('VAR_0551', axis=1, inplace=True)
+test.drop('VAR_0254', axis=1, inplace=True)
+test.drop('VAR_0227', axis=1, inplace=True)
+test.drop('VAR_0212', axis=1, inplace=True)
 
 from sklearn import preprocessing
 obs = train.dtypes == 'object'
@@ -34,8 +45,8 @@ for col in obs:
         del test[col]
         del train[col]
         
-#train = train.fillna(-1)
-#test = test.fillna(-1)
+train = train.fillna(-1)
+test = test.fillna(-1)
 
 test_ind = test.index
 
@@ -44,19 +55,19 @@ import xgboost as xgb
 
 xgtest = xgb.DMatrix(test)
 
-offset = 30000
-num_round = 50
-gb_params = {'max_depth':16, 'eta':.1, 'silent':1, \
-'objective':'binary:logistic', 'eval_metric': 'auc'}
-
-#Create a train and validation dmatrices 
+#Create a train and validation dmatrices
+offset = 30000 
 xgtrain = xgb.DMatrix(train[offset:], label=labels[offset:])
 xgval = xgb.DMatrix(train[:offset], label=labels[:offset])
 
 #Train model and predict test values
+
+num_round = 100
+gb_params = {'max_depth':16, 'eta':.1, 'silent':1, \
+'objective':'binary:logistic', 'eval_metric': 'auc'}
 watchlist = [(xgtrain, 'train'),(xgval, 'val')]
 model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
-early_stopping_rounds=4)
+early_stopping_rounds=3)
 preds1 = model.predict(xgtest, ntree_limit=model.best_iteration)
 
 fscore = [ (v,k) for k,v in model.get_fscore().iteritems() ]
@@ -67,7 +78,7 @@ model.dump_model('dump.raw.txt')
 #Send predicted scores to csv file
 submission = pd.DataFrame({"Id": test_ind, "target": preds1})
 submission = submission.set_index("Id")
-submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_9.csv')
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_14.csv')
 
 """Model #2 RandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
