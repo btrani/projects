@@ -78,7 +78,7 @@ model.dump_model('dump.raw.txt')
 #Send predicted scores to csv file
 submission = pd.DataFrame({"Id": test_ind, "target": preds1})
 submission = submission.set_index("Id")
-submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_14.csv')
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_15.csv')
 
 """Model #2 RandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
