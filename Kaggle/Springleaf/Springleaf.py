@@ -50,6 +50,22 @@ test = test.fillna(-1)
 
 test_ind = test.index
 
+#Model 1 RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cross_validation import train_test_split
+
+#Split data into train and test
+X_train, X_test, y_train, y_test = train_test_split(train, labels, \
+test_size=0.2, random_state=0)
+
+#Train and fit RF model
+rf_model = RandomForestClassifier(n_estimators = 2000, max_depth = 12, n_jobs = -1)
+rf_model.fit(X_train, y_train)
+score = rf_model.score(X_test, y_test)
+
+#Use trained model to predict test values
+preds_rf = rf_model.predict_proba(test)
+
 #Create XGB model   
 import xgboost as xgb
 
@@ -62,8 +78,8 @@ xgval = xgb.DMatrix(train[:offset], label=labels[:offset])
 
 #Train model and predict test values
 
-num_round = 100
-gb_params = {'max_depth':16, 'eta':.1, 'silent':1, \
+num_round = 200
+gb_params = {'max_depth':12, 'eta':.1, 'silent':1, \
 'objective':'binary:logistic', 'eval_metric': 'auc'}
 watchlist = [(xgtrain, 'train'),(xgval, 'val')]
 model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
@@ -78,9 +94,9 @@ model.dump_model('dump.raw.txt')
 #Send predicted scores to csv file
 submission = pd.DataFrame({"Id": test_ind, "target": preds1})
 submission = submission.set_index("Id")
-submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_15.csv')
+submission.to_csv('/Users/btrani/Git/projects/Kaggle/Springleaf/sub_gb_17.csv')
 
-"""Model #2 RandomForestClassifier
+#Model #1 RandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 from sklearn.cross_validation import train_test_split
