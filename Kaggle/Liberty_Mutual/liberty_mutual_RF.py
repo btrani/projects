@@ -95,6 +95,8 @@ model = xgb.train(gb_params, xgtrain, num_round, watchlist, \
 early_stopping_rounds=4)
 xg_preds = model.predict(xgtest, ntree_limit=model.best_iteration)
 
+xgb.plot_importance(model)
+
 fscore = [ (v,k) for k,v in model.get_fscore().iteritems() ]
 fscore.sort(reverse=True)
 
